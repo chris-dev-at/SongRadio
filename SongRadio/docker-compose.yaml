@@ -1,0 +1,61 @@
+﻿services:
+  api:
+    image: api
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+
+  aggregator:
+    image: aggregator
+    build:
+      context: .
+      dockerfile: Aggregator/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+    env_file:
+      - .env
+      
+  azurite:
+    container_name: songradio_azurite
+    image: mcr.microsoft.com/azure-storage/azurite:3.27.0
+    expose:
+      - 10000
+      - 10001
+      - 10002
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - default-azurite-volume:/data mcr.microsoft.com/azure-storage/azurite
+        
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q status
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+      
+  
+
+volumes:
+  rabbitmq_data:
+  default-azurite-volume:

@@ -13,6 +13,9 @@ public class Program
         
         var app = builder.Build();
         
+        var azureStorageAccountConnectionString = app.Configuration.GetValue<string>("azureStorageServiceConnectionString") ?? "UseDevelopmentStorage=true";
+        var rabbitMqHost = app.Configuration.GetValue<string>("rabbitMqHostname") ?? "localhost";
+        
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
