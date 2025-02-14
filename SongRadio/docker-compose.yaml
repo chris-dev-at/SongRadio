@@ -1,4 +1,5 @@
-﻿services:
+﻿name: songradio
+services:
   api:
     image: api
     build:
@@ -8,6 +9,9 @@
       rabbitmq:
         condition: service_healthy
         restart: true
+      azurite:
+        condition: service_healthy
+        restart: true    
 
   aggregator:
     image: aggregator
@@ -18,6 +22,10 @@
       rabbitmq:
         condition: service_healthy
         restart: true
+      azurite:
+        condition: service_healthy
+        restart: true
+      
     env_file:
       - .env
       
@@ -34,6 +42,13 @@
       - "10002:10002"
     volumes:
       - default-azurite-volume:/data mcr.microsoft.com/azure-storage/azurite
+    healthcheck:
+      test: [ "CMD", "nc", "-zv", "localhost", "10000", "&&", "nc", "-zv", "localhost", "10001", "&&", "nc", "-zv", "localhost", "10002" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+        
         
   rabbitmq:
     image: rabbitmq:3-management
