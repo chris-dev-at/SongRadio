@@ -18,8 +18,11 @@ public class Program
         
         var app = builder.Build();
         
-        var cloudStorageConn = app.Configuration.GetValue<string>("azureStorageServiceConnectionString") ?? "UseDevelopmentStorage=true";
-        var rabbitMqHost = app.Configuration.GetValue<string>("rabbitMqHostname") ?? "localhost";
+        var cloudStorageConn = Environment.GetEnvironmentVariable("azureStorageServiceConnectionString", EnvironmentVariableTarget.Process)  ?? app.Configuration.GetValue<string>("azureStorageServiceConnectionString") ?? "UseDevelopmentStorage=true";
+        var rabbitMqHost = app.Configuration.GetValue<string>("rabbitMqHostname") ?? "rabbitmq";
+
+        Console.WriteLine($"Using Azure Storage Connection: {cloudStorageConn}");
+        Console.WriteLine($"Using RabbitMQ Host: {rabbitMqHost}");
         
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

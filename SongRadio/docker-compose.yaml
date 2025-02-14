@@ -5,32 +5,35 @@ services:
     build:
       context: .
       dockerfile: API/Dockerfile
+    restart: always
+    ports:
+      - 8080:8080
+      - 8081:8081
     depends_on:
       rabbitmq:
         condition: service_healthy
         restart: true
       azurite:
-        condition: service_healthy
-        restart: true    
+        condition: service_started
+        restart: true   
 
   aggregator:
     image: aggregator
     build:
       context: .
       dockerfile: Aggregator/Dockerfile
+    restart: always
     depends_on:
       rabbitmq:
         condition: service_healthy
         restart: true
       azurite:
-        condition: service_healthy
+        condition: service_started
         restart: true
-      
     env_file:
       - .env
       
   azurite:
-    container_name: songradio_azurite
     image: mcr.microsoft.com/azure-storage/azurite:3.27.0
     expose:
       - 10000
@@ -42,12 +45,6 @@ services:
       - "10002:10002"
     volumes:
       - default-azurite-volume:/data mcr.microsoft.com/azure-storage/azurite
-    healthcheck:
-      test: [ "CMD", "nc", "-zv", "localhost", "10000", "&&", "nc", "-zv", "localhost", "10001", "&&", "nc", "-zv", "localhost", "10002" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 20s
         
         
   rabbitmq:
@@ -68,7 +65,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
-
 
 volumes:
   rabbitmq_data:

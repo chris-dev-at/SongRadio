@@ -27,6 +27,9 @@ class Program
         var rabbitMqHost = 
             Environment.GetEnvironmentVariable("azureStorageServiceConnectionString", EnvironmentVariableTarget.Process) ?? "UseDevelopmentStorage=true;";
         
+        Console.WriteLine($"Using Azure Storage Connection: {azureStorageAccountConnectionString}");
+        Console.WriteLine($"Using RabbitMQ Host: {rabbitMqHost}");
+        
         
         var statisticsSS = new StatisticsSS(azureStorageAccountConnectionString);
         var factory = new ConnectionFactory { HostName = rabbitMqHost };
