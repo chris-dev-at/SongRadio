@@ -3,12 +3,12 @@ using Model.Entities;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 
-namespace Model.Entities;
+namespace Model.Services;
 
-public class RabbitMQService
+public class RabbitMqCommunication
 {
     private IModel model;
-    public RabbitMQService(string hostname)
+    public RabbitMqCommunication(string hostname)
     {
         var factory = new ConnectionFactory { HostName = hostname };
         var connection = factory.CreateConnection();
